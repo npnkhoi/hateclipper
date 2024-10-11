@@ -137,12 +137,13 @@ def main(args):
         monitor="val/auroc"
         project="meme-v2"
 
-    wandb_logger = WandbLogger(project=project, config=args)
+    wandb_logger = WandbLogger(project=project, config=args, entity='khoi-ml') # TODO: change entity based on your wandb account
     num_params = {f'param_{n}':p.numel() for n, p in model.named_parameters() if p.requires_grad}
     wandb_logger.experiment.config.update(num_params)
     checkpoint_callback = ModelCheckpoint(dirpath='checkpoints', filename=wandb_logger.experiment.name+'-{epoch:02d}',  monitor=monitor, mode='max', verbose=True, save_weights_only=True, save_top_k=1, save_last=False)
     trainer = Trainer(
-        accelerator='auto', 
+        # accelerator='auto', 
+        gpus=args.gpus,
         max_epochs=args.max_epochs, 
         max_steps=args.max_steps, 
         gradient_clip_val=args.gradient_clip_val, 

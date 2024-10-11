@@ -48,6 +48,7 @@ class CLIPClassifier(pl.LightningModule):
             self.f1 = torchmetrics.F1Score('binary')
         
         self.clip = CLIPModel.from_pretrained(args.clip_pretrained_model)
+        # breakpoint()
         if args.local_pretrained_weights != 'none':
             state_dict = torch.load(args.local_pretrained_weights)['state_dict']
             state_dict = {k[5:]:v for k,v in state_dict.items() if k.startswith('clip')}
