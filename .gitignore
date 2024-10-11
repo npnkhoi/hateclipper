@@ -1,6 +1,6 @@
 __pycache__/
 checkpoints/
-data/
+data/hateful_memes/img/
 explaining/models/
 explaining/confounders/
 explaining/deep_lift/

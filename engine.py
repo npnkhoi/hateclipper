@@ -35,17 +35,17 @@ class CLIPClassifier(pl.LightningModule):
         self.text_encoder_name = args.text_encoder
         self.dataset = args.dataset
 
-        self.acc = torchmetrics.Accuracy()
+        self.acc = torchmetrics.Accuracy('binary')
         if self.dataset == 'prop':
             self.auroc = torchmetrics.AUROC(num_classes=22)
             self.precision_score = torchmetrics.Precision(mdmc_average='global')
             self.recall = torchmetrics.Recall(mdmc_average='global')
             self.f1 = torchmetrics.F1Score(mdmc_average='global')
         else:
-            self.auroc = torchmetrics.AUROC()
-            self.precision_score = torchmetrics.Precision()
-            self.recall = torchmetrics.Recall()
-            self.f1 = torchmetrics.F1Score()
+            self.auroc = torchmetrics.AUROC('binary')
+            self.precision_score = torchmetrics.Precision('binary')
+            self.recall = torchmetrics.Recall('binary')
+            self.f1 = torchmetrics.F1Score('binary')
         
         self.clip = CLIPModel.from_pretrained(args.clip_pretrained_model)
         if args.local_pretrained_weights != 'none':

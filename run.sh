@@ -19,5 +19,6 @@ python3 main.py --dataset original \
     --weight_text_loss 0 \
     --weight_fine_grained_loss 0 \
     --weight_super_loss 0 \
+    --strategy auto \
     --max_epochs 20
     

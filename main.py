@@ -8,7 +8,7 @@ from engine import create_model
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.plugins import DDPPlugin
+from pytorch_lightning.strategies import DDPStrategy
 from torch.utils.data import DataLoader
 
 def str2bool(v):
@@ -141,10 +141,18 @@ def main(args):
     num_params = {f'param_{n}':p.numel() for n, p in model.named_parameters() if p.requires_grad}
     wandb_logger.experiment.config.update(num_params)
     checkpoint_callback = ModelCheckpoint(dirpath='checkpoints', filename=wandb_logger.experiment.name+'-{epoch:02d}',  monitor=monitor, mode='max', verbose=True, save_weights_only=True, save_top_k=1, save_last=False)
-    trainer = Trainer(gpus=args.gpus, max_epochs=args.max_epochs, max_steps=args.max_steps, gradient_clip_val=args.gradient_clip_val, 
-        logger=wandb_logger, log_every_n_steps=args.log_every_n_steps, val_check_interval=args.val_check_interval,
-        strategy=args.strategy, callbacks=[checkpoint_callback],
-        limit_train_batches=args.limit_train_batches, limit_val_batches=args.limit_val_batches,
+    trainer = Trainer(
+        accelerator='auto', 
+        max_epochs=args.max_epochs, 
+        max_steps=args.max_steps, 
+        gradient_clip_val=args.gradient_clip_val, 
+        logger=wandb_logger, 
+        log_every_n_steps=args.log_every_n_steps, 
+        val_check_interval=args.val_check_interval,
+        strategy=args.strategy, 
+        callbacks=[checkpoint_callback],
+        limit_train_batches=args.limit_train_batches, 
+        limit_val_batches=args.limit_val_batches,
         deterministic=True)
     
     model.compute_fine_grained_metrics = True
@@ -162,7 +170,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.gpus = [int(id_) for id_ in args.gpus.split()]
     if args.strategy == 'ddp':
-        args.strategy = DDPPlugin(find_unused_parameters=False)
+        args.strategy = DDPStrategy(find_unused_parameters=False)
     elif args.strategy == 'none':
         args.strategy = None
 
